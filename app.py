@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, jsonify
 from flask_mysqldb import MySQL
 import yaml
 
@@ -39,6 +39,15 @@ def users():
         userDetails = cur.fetchall()
         return render_template('users.html', userDetails=userDetails)
     return 'no data'
+
+
+@app.route('/getusers')
+def fetchUsers():
+    cur = mysql.connection.cursor()
+    resultValue = cur.execute("SELECT * FROM users")
+    json = [dict((cur.description[i][0], value)
+                 for i, value in enumerate(row)) for row in cur.fetchall()]
+    return jsonify({'users': json})
 
 
 if __name__ == '__main__':
